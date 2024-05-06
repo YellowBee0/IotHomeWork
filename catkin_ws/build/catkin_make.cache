@@ -1,0 +1,2 @@
+learning_communication:learning_control:learning_topic:tutorials
+-DCATKIN_DEVEL_PREFIX=/home/yellowbee/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/yellowbee/catkin_ws/install -G Unix Makefiles

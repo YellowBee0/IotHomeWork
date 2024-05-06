@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>tutorials</name>
+  <version>0.0.0</version>
+  <description>The tutorials package</description>
+
+  <maintainer email="nan@todo.todo">nanorobot</maintainer>
+
+  <license>TODO</license>
+</package>
+
