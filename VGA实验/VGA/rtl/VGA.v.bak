@@ -1,0 +1,50 @@
+module vga_driver(
+    input   wire            clk_25MHz,  //时钟，25MHZ
+    input   wire                rst, // 复位信号，低电平有效
+    input   wire        [15:0]  pixel_data, //RGB--565，即pixel_data[15:11]控制R、pixel_data[10:5]控制G、pixel_data[4:0]控制B
+    
+    output  wire        [  9:0] pixel_hpos, //pixel_data的行坐标
+    output  wire        [  9:0] pixel_vpos, //pixel_data的列坐标
+    output  wire                vga_hs,     //行同步信号
+    output  wire                vga_vs,     //列同步信号
+    output  wire        [15:0]  vga_rgb     //输出到VGA接口的颜色数据
+);
+//内部参量定义,vga时序参数60HZ
+parameter           H_SYNC      = 10'd96;   // 同步期
+parameter           H_BACK      = 10'd48;   // 显示后沿
+parameter           H_DISP      = 10'd640;      // 显示区域
+parameter           H_FRONT     = 10'd16;   // 显示前沿
+parameter           H_PRIOD     = 10'd800;      // 行周期总长度
+ 
+parameter           V_SYNC      = 10'd2;        // 同步期
+parameter           V_BACK      = 10'd33;   // 显示后沿
+parameter           V_DISP      = 10'd480;     // 显示区域
+parameter           V_FRONT     = 10'd10;   // 显示前沿
+parameter           V_PRIOD = 10'd525;  // 列周期总长度
+// 确定像素当前坐标
+assign  pixel_hpos = pixel_data_require ? (cnt_h - (H_SYNC + H_BACK - 1'b1)) : 10'd0;
+assign  pixel_vpos = pixel_data_require ? (cnt_v - (V_SYNC + V_BACK - 1'b1)) : 10'd0;
+// 确定像素数据
+assign vga_rgb = vga_en ? pixel_data:16'd0;
+// 判断当前坐标的像素数据
+always @ (posedge clk_25MHz or negedge rst)begin
+    if(!rst)begin
+        // pixel_data <= 16'd0;
+        pixel_data <= BLACK;
+    end
+    else begin
+        if(pic_area == 1'b0)begin
+            if (pixel_hpos >= 0 && pixel_hpos <= (H_DISP / 5) * 1)
+                pixel_data <= WHITE;
+            else if (pixel_hpos >= (H_DISP / 5) * 1 && pixel_hpos < (H_DISP / 5) * 2)
+                pixel_data <= BLACK;
+            else if (pixel_hpos >= (H_DISP / 5) * 2 && pixel_hpos < (H_DISP / 5) * 3)
+                pixel_data <= RED;
+            else if (pixel_hpos >=(H_DISP / 5) * 3 && pixel_hpos < (H_DISP / 5) * 4)
+                pixel_data <= GREEN;
+            else
+                pixel_data <= BLUE;
+        end
+    end
+end
+endmodule
